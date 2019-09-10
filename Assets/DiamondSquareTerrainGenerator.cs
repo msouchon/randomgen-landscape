@@ -6,35 +6,42 @@ using UnityEngine.Assertions;
 public class DiamondSquareTerrainGenerator : MonoBehaviour
 {
 
-    public int sizeFactor = 7;
+    public int actualSize = 256;
+
+    public int resolutionFactor = 7;
 
     public int height = 200;
 
+    public float variation = 1.0f;
+
     [Range (0, 1)] public float smoothness;
 
-    private int size;
+    public bool tanhFilter = false;
+
+    public bool laplaceFilter = false;
 
     // Start is called before the first frame update
     void Start()
     {
-	size = (int) Mathf.Pow(2, sizeFactor) + 1;
+	int resolution = (int) Mathf.Pow(2, resolutionFactor) + 1;
         Terrain terrain = GetComponent<Terrain>();
-	terrain.terrainData.heightmapResolution = size + 1;
-	terrain.terrainData.size = new Vector3(size, height, size);
-	float[,] heightmap = GenerateHeightmap();
-	//heightmap = SmoothingFilter(heightmap);
+	terrain.terrainData.heightmapResolution = resolution + 1;
+	terrain.terrainData.size = new Vector3(actualSize, height, actualSize);
+	float[,] heightmap = GenerateHeightmap(resolution);
+	if (tanhFilter) heightmap = SmoothingFilter(heightmap, resolution);
+	if (laplaceFilter) heightmap = LaplaceFilter(heightmap, resolution);
 	terrain.terrainData.SetHeights(0, 0, heightmap);
     }
-    float[,] GenerateHeightmap() {
+    float[,] GenerateHeightmap(int size) {
 	float[,] heightmap = new float[size, size];
 
-	float cornerHeight = 0; //Random.value;
+	float cornerHeight = Random.value;
 	heightmap[0, 0] = cornerHeight;
 	heightmap[0, size-1] = cornerHeight;
 	heightmap[size-1, 0] = cornerHeight;
 	heightmap[size-1, size-1] = cornerHeight;
 
-	float average, variation = 1.0f;
+	float average = 1.0f;
 	int step, x, y;
 
 	for (step = (size-1)/2; step > 1; step /= 2) {
@@ -47,19 +54,21 @@ public class DiamondSquareTerrainGenerator : MonoBehaviour
 			       heightmap[x + step, y + step]
 			      ) / 4.0f;
 		    average += (Random.value - 0.5f) * variation;
-		    heightmap[x + step/2, y + step/2] = average;
+		    heightmap[x + step/2, y + step/2] = Mathf.Clamp01(average);
 		}
 	     }
 	     // Square Step
 	     for (x = 0; x < size-1; x += step/2) {
 		for (y = (x + step/2) % step; y < size-1; y += step) {
-		    average = (heightmap[x, (y + step/2) % size] +
-			       heightmap[x, (y - step/2 + size) % size] +
-			       heightmap[(x + step/2) % size, y] +
-			       heightmap[(x - step/2 + size) % size, y]
+		    average = (heightmap[x, (y + step/2) % (size - 1)] +
+			       heightmap[x, (y - step/2 + size - 1) % (size - 1)] +
+			       heightmap[(x + step/2) % (size - 1), y] +
+			       heightmap[(x - step/2 + size - 1) % (size - 1), y]
 			      ) / 4.0f;
 		    average += (Random.value - 0.5f) * variation;
-		    heightmap[x, y] = average;
+		    heightmap[x, y] = Mathf.Clamp01(average);
+		    if (x == 0) heightmap[size - 1, y] = Mathf.Clamp01(average);
+		    if (y == 0) heightmap[x, size - 1] = Mathf.Clamp01(average);
 		}
 	     }
 	     variation *= smoothness;
@@ -67,6 +76,7 @@ public class DiamondSquareTerrainGenerator : MonoBehaviour
 
 	return heightmap;
     }
+    /*
     void DiamondStep(float[,] heightmap, int curr_size, int x, int y) {
 	Debug.Log(curr_size);
 	float average = (heightmap[x - curr_size, y - curr_size] + // Bottom Left
@@ -93,12 +103,24 @@ public class DiamondSquareTerrainGenerator : MonoBehaviour
 	    curr_size = (curr_size-1)/2;
 	    DiamondStep(heightmap, curr_size, (x + curr_size) % size, (y + curr_size) % size);
 	}
-    }
+    }*/
 
-    float[,] SmoothingFilter(float[,] heightmap) {
+    float[,] SmoothingFilter(float[,] heightmap, int size) {
 	for (int x = 0; x < size; x++) {
 	    for (int y = 0; y < size; y++) {
 		heightmap[x, y] = (float) (System.Math.Tanh(heightmap[x, y] * Mathf.PI / 2) + 1)/2;
+	    }
+	}
+	return heightmap;
+    }
+
+    float[,] LaplaceFilter(float[,] heightmap, int size) {
+	for (int x = 0; x < size; x++) {
+	    for (int y = 0; y < size; y++) {
+		heightmap[x, y] = (heightmap[(x-1 + size) % size, y] +
+				   heightmap[(x+1) % size, y] +
+				   heightmap[x, (y-1+ size) % size] +
+				   heightmap[x, (y+1) % size])/4;
 	    }
 	}
 	return heightmap;
