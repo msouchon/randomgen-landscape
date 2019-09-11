@@ -20,6 +20,8 @@ public class DiamondSquareTerrainGenerator : MonoBehaviour
 
     public bool laplaceFilter = false;
 
+    [Range (0, 10)] public int laplaceFilterPasses = 1;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -29,7 +31,11 @@ public class DiamondSquareTerrainGenerator : MonoBehaviour
 	terrain.terrainData.size = new Vector3(actualSize, height, actualSize);
 	float[,] heightmap = GenerateHeightmap(resolution);
 	if (tanhFilter) heightmap = SmoothingFilter(heightmap, resolution);
-	if (laplaceFilter) heightmap = LaplaceFilter(heightmap, resolution);
+	if (laplaceFilter) {
+	    for (int i = 0; i < laplaceFilterPasses; i++) {
+	        heightmap = LaplaceFilter(heightmap, resolution);
+	    }
+	}
 	terrain.terrainData.SetHeights(0, 0, heightmap);
     }
     float[,] GenerateHeightmap(int size) {
