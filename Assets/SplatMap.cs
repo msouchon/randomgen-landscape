@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class SplatMap : MonoBehaviour
 {
+    public bool blend = true;
+    public Material material;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -62,6 +65,10 @@ public class SplatMap : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if(blend) {
+            material.SetFloat("_Blend", 1);
+        } else {
+            material.SetFloat("_Blend", 0);
+        }
     }
 }

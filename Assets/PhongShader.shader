@@ -44,6 +44,9 @@ Shader "Unlit/PhongShader"
 
 		_PointLightColor("Point Light Color", Color) = (0, 0, 0)
 		_PointLightPosition("Point Light Position", Vector) = (0.0, 0.0, 0.0)
+
+		// Using a Float to represent a Boolean
+		_Blend("Blend Textures", Float) = 1
 	}
 	SubShader
 	{ 
@@ -65,10 +68,12 @@ Shader "Unlit/PhongShader"
 			float4 _Splat0_ST, _Splat1_ST, _Splat2_ST, _Splat3_ST;
 			uniform sampler2D _Splat0,_Splat1,_Splat2,_Splat3;
 			uniform fixed4 _Color;
-			uniform sampler2D _Ramp;
 
 			uniform float3 _PointLightColor;
 			uniform float3 _PointLightPosition;
+
+			// Using a Float to represent a Boolean
+			uniform float _Blend;
 
 			struct vertIn
 			{
@@ -126,6 +131,18 @@ Shader "Unlit/PhongShader"
 				return o;
 			}
 
+			// Function to make blending between textures sharper
+			float4 blend(float4 texA, float aA, float4 texB, float aB)
+			{
+				float depth = 0.1;
+				float ma = max(texA.a + aA, texB.a + aB) - depth;
+
+				float b1 = max(texA.a + aA - ma, 0.0);
+				float b2 = max(texB.a + aB - ma, 0.0);
+
+				return (texA * b1 + texB * b2) / (b1 + b2);
+			}
+
 			// Implementation of the fragment shader
 			fixed4 frag(vertOut v) : SV_Target
 			{
@@ -163,13 +180,26 @@ Shader "Unlit/PhongShader"
 
 				// Calculate colours for terain textures
 				fixed4 splat_control = tex2D(_Control, v.uv_Control);
-				fixed3 col;
-				col = splat_control.r * tex2D(_Splat0, v.uv_Splat0).rgb;
-				col += splat_control.g * tex2D(_Splat1, v.uv_Splat1).rgb;
-				col += splat_control.b * tex2D(_Splat2, v.uv_Splat2).rgb;
-				col += splat_control.a * tex2D(_Splat3, v.uv_Splat3).rgb;
 
-				returnColor.rgb = returnColor.rgb * col * _Color;
+				// Dont blend textures if not set
+				if (_Blend == 0) {
+					fixed3 col;
+					col = splat_control.r * tex2D(_Splat0, v.uv_Splat0).rgb;
+					col += splat_control.g * tex2D(_Splat1, v.uv_Splat1).rgb;
+					col += splat_control.b * tex2D(_Splat2, v.uv_Splat2).rgb;
+					col += splat_control.a * tex2D(_Splat3, v.uv_Splat3).rgb;
+					returnColor.rgb = returnColor.rgb * col * _Color;
+
+					return returnColor;
+				}
+
+				// If not, blend
+				fixed4 col;
+				col = blend(tex2D(_Splat0, v.uv_Splat0), splat_control.r, tex2D(_Splat1, v.uv_Splat1), splat_control.g);
+				col = blend(col, splat_control.r + splat_control.g, tex2D(_Splat2, v.uv_Splat2), splat_control.b);
+				col = blend(col, splat_control.r + splat_control.g + splat_control.b, tex2D(_Splat3, v.uv_Splat3), splat_control.a);
+
+				returnColor.rgb = returnColor.rgb * col.rgb * _Color;
 
 				return returnColor;
 			}
