@@ -47,6 +47,7 @@ Shader "Unlit/PhongShader"
 
 		// Using a Float to represent a Boolean
 		_Blend("Blend Textures", Float) = 1
+		_BlendAmount("Blend Amount", Float) = 0.1
 	}
 	SubShader
 	{ 
@@ -74,6 +75,7 @@ Shader "Unlit/PhongShader"
 
 			// Using a Float to represent a Boolean
 			uniform float _Blend;
+			uniform float _BlendAmount;
 
 			struct vertIn
 			{
@@ -134,7 +136,7 @@ Shader "Unlit/PhongShader"
 			// Function to make blending between textures sharper
 			float4 blend(float4 texA, float aA, float4 texB, float aB)
 			{
-				float depth = 0.1;
+				float depth = _BlendAmount;
 				float ma = max(texA.a + aA, texB.a + aB) - depth;
 
 				float b1 = max(texA.a + aA - ma, 0.0);
