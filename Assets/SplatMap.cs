@@ -9,6 +9,13 @@ public class SplatMap : MonoBehaviour
     public float blendAmount = 0.1f;
     public Material material;
 
+    public float Kd = 1;
+    public float Ks = 1;
+    public float specN = 1;
+    public float Ka = 1;
+    public float fAtt = 1;
+    
+
     // Start is called before the first frame update
     void Start()
     {
@@ -73,5 +80,11 @@ public class SplatMap : MonoBehaviour
             material.SetFloat("_Blend", 0);
         }
         material.SetFloat("_BlendAmount", blendAmount);
+
+        material.SetFloat("_Ks", Ks);
+        material.SetFloat("_specN", specN);
+        material.SetFloat("_Kd", Kd);
+        material.SetFloat("_Ka", Ka);
+        material.SetFloat("_fAtt", fAtt);
     }
 }
