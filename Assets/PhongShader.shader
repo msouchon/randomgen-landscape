@@ -136,8 +136,7 @@ Shader "Unlit/PhongShader"
 			// Function to make blending between textures sharper
 			float4 blend(float4 texA, float aA, float4 texB, float aB)
 			{
-				float depth = _BlendAmount;
-				float ma = max(texA.a + aA, texB.a + aB) - depth;
+				float ma = max(texA.a + aA, texB.a + aB) - _BlendAmount;
 
 				float b1 = max(texA.a + aA - ma, 0.0);
 				float b2 = max(texB.a + aB - ma, 0.0);
