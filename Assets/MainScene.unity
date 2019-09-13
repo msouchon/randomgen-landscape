@@ -330,12 +330,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   color: {r: 0.8867924, g: 0.7200014, b: 0.43921322, a: 0}
   colorLow: {r: 0.9056604, g: 0.3610789, b: 0.14951938, a: 0}
-  Kd: 1
-  Ks: 0.31
-  specN: 0.85
-  Ka: 0.33
-  fAtt: 1
-  material: {fileID: 2100000, guid: 313d4920ddca0c14c88d34d6139d0a68, type: 2}
+  materialList:
+  - {fileID: 2100000, guid: 313d4920ddca0c14c88d34d6139d0a68, type: 2}
+  - {fileID: 2100000, guid: b868a36f5c5b53f4ebdf36d2ff2fd7d6, type: 2}
 --- !u!4 &856034419
 Transform:
   m_ObjectHideFlags: 0
@@ -675,6 +672,7 @@ GameObject:
   - component: {fileID: 2007699601}
   - component: {fileID: 2007699600}
   - component: {fileID: 2007699604}
+  - component: {fileID: 2007699605}
   m_Layer: 0
   m_Name: Terrain
   m_TagString: Untagged
@@ -779,3 +777,27 @@ MonoBehaviour:
   blend: 1
   blendAmount: 0.1
   material: {fileID: 2100000, guid: 313d4920ddca0c14c88d34d6139d0a68, type: 2}
+  Kd: 1
+  Ks: 0.31
+  specN: 0.85
+  Ka: 0.33
+  fAtt: 1
+--- !u!114 &2007699605
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2007699599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3862d69525dcb54bb7a64939d85f7a5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  waterHeight: 5
+  waterMaterial: {fileID: 2100000, guid: b868a36f5c5b53f4ebdf36d2ff2fd7d6, type: 2}
+  Kd: 1
+  Ks: 0.31
+  specN: 0.85
+  Ka: 0.33
+  fAtt: 1

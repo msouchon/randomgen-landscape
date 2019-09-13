@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Phong
+  m_Name: TerrainPhong
   m_Shader: {fileID: 4800000, guid: 8fb55ef00c307ff4dbf43a3de4074677, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
@@ -102,5 +102,5 @@ Material:
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _PointLightColor: {r: 0.9056604, g: 0.3610789, b: 0.14951938, a: 0}
-    - _PointLightPosition: {r: 559.8215, g: -253.00328, b: 250, a: 0}
+    - _PointLightColor: {r: 0.8867924, g: 0.7200014, b: 0.43921322, a: 0}
+    - _PointLightPosition: {r: 145.34, g: 386.06512, b: 250, a: 0}
