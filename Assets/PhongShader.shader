@@ -48,6 +48,8 @@ Shader "Unlit/PhongShader"
 		// Using a Float to represent a Boolean
 		_Blend("Blend Textures", Float) = 1
 		_BlendAmount("Blend Amount", Float) = 0.1
+
+		_Kd("Kd", Float) = 1
 	}
 	SubShader
 	{ 
@@ -76,6 +78,7 @@ Shader "Unlit/PhongShader"
 			// Using a Float to represent a Boolean
 			uniform float _Blend;
 			uniform float _BlendAmount;
+			uniform float _Kd;
 
 			struct vertIn
 			{
@@ -157,7 +160,7 @@ Shader "Unlit/PhongShader"
 				// Calculate diffuse RBG reflections, we save the results of L.N because we will use it again
 				// (when calculating the reflected ray in our specular component)
 				float fAtt = 1;
-				float Kd = 1;
+				float Kd = _Kd;
 				float3 L = normalize(_PointLightPosition - v.worldVertex.xyz);
 				float LdotN = dot(L, interpNormal);
 				float3 dif = fAtt * _PointLightColor.rgb * Kd * v.color.rgb * saturate(LdotN);
