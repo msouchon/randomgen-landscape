@@ -13,4 +13,6 @@
 *.un~
 *.swp
 *.cs~
-*csproj
+*.csproj
+*.shader~
+*.sln
