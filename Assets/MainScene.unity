@@ -197,6 +197,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   color: {r: 0.8867924, g: 0.7200014, b: 0.43921322, a: 0}
+  Kd: 1
+  Ks: 0.31
+  specN: 0.85
+  Ka: 0.33
+  fAtt: 1
   material: {fileID: 2100000, guid: 313d4920ddca0c14c88d34d6139d0a68, type: 2}
 --- !u!4 &856034419
 Transform:
@@ -440,6 +445,7 @@ MonoBehaviour:
   smoothness: 0.43
   tanhFilter: 0
   laplaceFilter: 1
+  laplaceFilterPasses: 10
 --- !u!154 &2007699601
 TerrainCollider:
   m_ObjectHideFlags: 0
@@ -515,4 +521,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blend: 1
+  blendAmount: 0.1
   material: {fileID: 2100000, guid: 313d4920ddca0c14c88d34d6139d0a68, type: 2}
