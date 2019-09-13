@@ -329,6 +329,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   color: {r: 0.8867924, g: 0.7200014, b: 0.43921322, a: 0}
+  colorLow: {r: 0.9056604, g: 0.3610789, b: 0.14951938, a: 0}
   material: {fileID: 2100000, guid: 313d4920ddca0c14c88d34d6139d0a68, type: 2}
 --- !u!4 &856034419
 Transform:
