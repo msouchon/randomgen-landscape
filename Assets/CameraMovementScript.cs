@@ -25,7 +25,7 @@ public class CameraMovementScript : MonoBehaviour
         Vector3 vertical, horizonal, jump;
         vertical = transform.forward * Input.GetAxis("Vertical") * speed;
         horizonal = transform.right * Input.GetAxis("Horizontal") * speed;
-        jump = transform.up * Input.GetAxis("Jump") * speed;
+        jump = Vector3.up * Input.GetAxis("Jump") * speed;
 
         rigidbody.velocity = vertical + horizonal + jump;
     }
