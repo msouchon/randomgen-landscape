@@ -102,5 +102,5 @@ Material:
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _PointLightColor: {r: 0.9056604, g: 0.3610789, b: 0.14951938, a: 0}
-    - _PointLightPosition: {r: 569.7295, g: -240.3604, b: 250, a: 0}
+    - _PointLightColor: {r: 0.8867924, g: 0.7200014, b: 0.43921322, a: 0}
+    - _PointLightPosition: {r: 19.887238, g: 327.1821, b: 250, a: 0}
