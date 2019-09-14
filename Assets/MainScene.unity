@@ -795,6 +795,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   waterHeight: 5
+  vertexDensity: 100
   waterMaterial: {fileID: 2100000, guid: b868a36f5c5b53f4ebdf36d2ff2fd7d6, type: 2}
   Kd: 1
   Ks: 0.31

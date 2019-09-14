@@ -109,7 +109,6 @@ Shader "Unlit/PhongWaterShader"
 				float3 worldNormal = normalize(mul(transpose((float3x3)unity_WorldToObject), v.normal.xyz));
 
 				float noise = tex2Dlod(_NoiseTex, float4(v.texCoord.xy, 0, 0));
-				//v.vertex.x += sin(_Time * _WaveFrequency * noise) * _WaveAmplitude;
 				v.vertex.y += sin(_Time * _WaveFrequency * noise) * _WaveAmplitude + _WaveHeight;
 
 				// Transform vertex in world coordinates to camera coordinates, and pass colour
