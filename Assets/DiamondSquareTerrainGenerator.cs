@@ -18,38 +18,50 @@ public class DiamondSquareTerrainGenerator : MonoBehaviour
 
     public bool tanhFilter = false;
 
-    public bool laplaceFilter = false;
+    public bool laplaceFilter = true;
 
-    [Range (0, 10)] public int laplaceFilterPasses = 1;
+    [Range (0, 10)] public int laplaceFilterPasses = 10;
 
-    // Start is called before the first frame update
     void Start()
     {
+	// Calculate a valid resolution that is permitted by the algorithm
 	int resolution = (int) Mathf.Pow(2, resolutionFactor) + 1;
+
+	// Set up terrain
         Terrain terrain = GetComponent<Terrain>();
 	terrain.terrainData.heightmapResolution = resolution + 1;
 	terrain.terrainData.size = new Vector3(actualSize, height, actualSize);
 	float[,] heightmap = GenerateHeightmap(resolution);
-	if (tanhFilter) heightmap = SmoothingFilter(heightmap, resolution);
+
+	// Run filters
+	if (tanhFilter) heightmap = TanhFilter(heightmap, resolution);
 	if (laplaceFilter) {
 	    for (int i = 0; i < laplaceFilterPasses; i++) {
 	        heightmap = LaplaceFilter(heightmap, resolution);
 	    }
 	}
+
 	terrain.terrainData.SetHeights(0, 0, heightmap);
     }
+
+    // Given a size for a heightmap use the diamond square algorithm to build it
     float[,] GenerateHeightmap(int size) {
 	float[,] heightmap = new float[size, size];
 
+	// First Step:
+	// Randomise corner values
+	// They are the same as it allows this terrain to be placed
+	// alongside itself
 	float cornerHeight = Random.value;
 	heightmap[0, 0] = cornerHeight;
 	heightmap[0, size-1] = cornerHeight;
 	heightmap[size-1, 0] = cornerHeight;
 	heightmap[size-1, size-1] = cornerHeight;
 
-	float average = 1.0f;
+	float average;
 	int step, x, y;
 
+	// Half step size each time both steps are completed
 	for (step = (size-1)/2; step > 1; step /= 2) {
 	     // Diamond Step
 	     for (x = 0; x < size-1; x += step) {
@@ -60,12 +72,18 @@ public class DiamondSquareTerrainGenerator : MonoBehaviour
 			       heightmap[x + step, y + step]
 			      ) / 4.0f;
 		    average += (Random.value - 0.5f) * variation;
+
+		    // Clamp the value to make sure it doesnt go below 0
+		    // Unity terrain heightmaps only indicate difference between 0 and 1
 		    heightmap[x + step/2, y + step/2] = Mathf.Clamp01(average);
 		}
 	     }
 	     // Square Step
 	     for (x = 0; x < size-1; x += step/2) {
 		for (y = (x + step/2) % step; y < size-1; y += step) {
+		    // As square steps can rely on data outside of the heightmap
+		    // wrap around.
+		    // This allows the heightmap to be tiled
 		    average = (heightmap[x, (y + step/2) % (size - 1)] +
 			       heightmap[x, (y - step/2 + size - 1) % (size - 1)] +
 			       heightmap[(x + step/2) % (size - 1), y] +
@@ -73,45 +91,23 @@ public class DiamondSquareTerrainGenerator : MonoBehaviour
 			      ) / 4.0f;
 		    average += (Random.value - 0.5f) * variation;
 		    heightmap[x, y] = Mathf.Clamp01(average);
+
+		    // If setting the value of an edge point, set it also
+		    // on the wrap around
 		    if (x == 0) heightmap[size - 1, y] = Mathf.Clamp01(average);
 		    if (y == 0) heightmap[x, size - 1] = Mathf.Clamp01(average);
 		}
 	     }
+	     // After each set of steps reduce the randomness to smooth out the terrain
 	     variation *= smoothness;
 	}
 
 	return heightmap;
     }
-    /*
-    void DiamondStep(float[,] heightmap, int curr_size, int x, int y) {
-	Debug.Log(curr_size);
-	float average = (heightmap[x - curr_size, y - curr_size] + // Bottom Left
-		         heightmap[x - curr_size, y + curr_size] + // Top Left
-		         heightmap[x + curr_size, y - curr_size] + // Bottom Right
-		         heightmap[x + curr_size, y + curr_size] // Top Right
-			) / 4.0f;
-	heightmap[x, y] = average + Random.value;
-	if (curr_size >= 2) {
-	    SquareStep(heightmap, curr_size, x, y - curr_size);
-	    SquareStep(heightmap, curr_size, x, y + curr_size);
-	    SquareStep(heightmap, curr_size, x - curr_size, y);
-	    SquareStep(heightmap, curr_size, x + curr_size, y);
-	}
-    }
-    void SquareStep(float[,] heightmap, int curr_size, int x, int y) {
-	float average = (heightmap[(x - curr_size + size) % size, y] +
-			 heightmap[(x + curr_size) % size, y] +
-			 heightmap[x, (y - curr_size + size) % size] +
-			 heightmap[x, (y + curr_size) % size]
-			) / 4.0f;
-	heightmap[x, y] = average + Random.value;
-	if (curr_size >= 3) {
-	    curr_size = (curr_size-1)/2;
-	    DiamondStep(heightmap, curr_size, (x + curr_size) % size, (y + curr_size) % size);
-	}
-    }*/
 
-    float[,] SmoothingFilter(float[,] heightmap, int size) {
+    // Using the tanh function, applies it across the heightmap
+    // to change its values
+    float[,] TanhFilter(float[,] heightmap, int size) {
 	for (int x = 0; x < size; x++) {
 	    for (int y = 0; y < size; y++) {
 		heightmap[x, y] = (float) (System.Math.Tanh(heightmap[x, y] * Mathf.PI / 2) + 1)/2;
@@ -120,6 +116,8 @@ public class DiamondSquareTerrainGenerator : MonoBehaviour
 	return heightmap;
     }
 
+    // This filter is made for smoothing of polygonal meshes
+    // This can smooth a heightmap out after creation
     float[,] LaplaceFilter(float[,] heightmap, int size) {
 	for (int x = 0; x < size; x++) {
 	    for (int y = 0; y < size; y++) {
