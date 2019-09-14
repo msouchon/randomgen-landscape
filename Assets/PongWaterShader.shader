@@ -39,6 +39,11 @@ Shader "Unlit/PhongWaterShader"
 
 		_MainTex ("Texture", 2D) = "white" {}
 
+		_WaveFrequency("WaveFrequency", Float) = 1
+		_WaveAmplitude("WaveAmplitude", Float) = 1
+		_WaveHeight("WaveHeight", Float) = 1
+		_NoiseTex ("Texture", 2D) = "white" {}
+
 	}
 	SubShader
 	{ 
@@ -64,8 +69,13 @@ Shader "Unlit/PhongWaterShader"
 			uniform float _Ks;
 
 			uniform sampler2D _MainTex;
-
 			float4 _MainTex_ST;
+
+			uniform float _WaveFrequency;
+			uniform float _WaveAmplitude;
+			uniform float _WaveHeight;
+			uniform sampler2D _NoiseTex;
+			float4 _NoiseTex_ST;
 
 
 			struct vertIn
@@ -74,6 +84,7 @@ Shader "Unlit/PhongWaterShader"
 				float4 normal : NORMAL;
 				float4 color : COLOR;
 				float2 uv : TEXCOORD0;
+				float3 texCoord : TEXCOORD1;
 			};
 
 			struct vertOut
@@ -96,6 +107,10 @@ Shader "Unlit/PhongWaterShader"
 				// care about the "fourth" dimension, because translations don't affect the normal) 
 				float4 worldVertex = mul(unity_ObjectToWorld, v.vertex);
 				float3 worldNormal = normalize(mul(transpose((float3x3)unity_WorldToObject), v.normal.xyz));
+
+				float noise = tex2Dlod(_NoiseTex, float4(v.texCoord.xy, 0, 0));
+				//v.vertex.x += sin(_Time * _WaveFrequency * noise) * _WaveAmplitude;
+				v.vertex.y += sin(_Time * _WaveFrequency * noise) * _WaveAmplitude + _WaveHeight;
 
 				// Transform vertex in world coordinates to camera coordinates, and pass colour
 				o.vertex = mul(UNITY_MATRIX_MVP, v.vertex);
