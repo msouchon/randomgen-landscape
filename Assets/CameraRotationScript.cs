@@ -6,21 +6,38 @@ public class CameraRotationScript : MonoBehaviour
 {
 
     public float cameraSensitivity = 1.0f;
+    
+    public Rigidbody rb;
 
-    private float pitch = 0.0f;
-    private float yaw = 0.0f;
+    public bool firstPersonStandard = false;
+
+    private float pitch, yaw;
+
+    private Quaternion currRotation;
 
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
+	currRotation = Quaternion.identity;
     }
 
     void Update()
     {
-	// Control mouse movement
-	pitch -= cameraSensitivity * Input.GetAxis("Mouse Y");
-	yaw += cameraSensitivity * Input.GetAxis("Mouse X");
-	this.transform.eulerAngles = new Vector3(pitch, yaw, 0);
+	// A normal form of movement
+	if (firstPersonStandard) {
+	    pitch -= cameraSensitivity * Input.GetAxis("Mouse Y");
+	    yaw += cameraSensitivity * Input.GetAxis("Mouse X");
+	    this.transform.eulerAngles = new Vector3(pitch, yaw, 0);
+	}
+	// A form of movement that avoids gimbal lock
+	else {
+	    Quaternion addRotation = Quaternion.identity;
+	    pitch = Input.GetAxis("Mouse Y");
+	    yaw = Input.GetAxis("Mouse X");
+	    addRotation.eulerAngles = new Vector3(-pitch, yaw, 0);
+	    currRotation *= addRotation;
+	    rb.MoveRotation(currRotation);
+	}
 
 	// Lock cursor if the screen is pressed, unlock if esc is pressed
         if(Input.GetButton("Fire1")) {

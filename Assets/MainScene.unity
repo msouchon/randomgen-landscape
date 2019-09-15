@@ -508,6 +508,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraSensitivity: 1
+  rb: {fileID: 910316848}
+  firstPersonStandard: 0
 --- !u!54 &910316848
 Rigidbody:
   m_ObjectHideFlags: 0
